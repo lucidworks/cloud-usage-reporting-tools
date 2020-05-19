@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#Script for labling namespaces
 
 GCLOUD_PROJECT=
 GCLOUD_CLUSTER=
@@ -10,6 +10,7 @@ COSTCENTER_TAG=
 echo "Use this script for adding the required tags to your namespace"
 
 
+#Usage function for --help --usage
 function print_usage() {
   CMD="$1"
   ERROR_MSG="$2"
@@ -24,6 +25,8 @@ function print_usage() {
 
 }
 
+
+#Entry parameters
 if [ $# -gt 0 ]; then
   while true; do
     case "$1" in
@@ -85,6 +88,7 @@ if [ "$GCLOUD_PROJECT" == "" ]; then
 fi
 
 
+
 gcloud --version > /dev/null 2<&1
 has_prereq=$?
 if [ $has_prereq == 1 ]; then
@@ -115,6 +119,10 @@ if [ "${current_value}" != "${GCLOUD_PROJECT}" ]; then
   gcloud config set project "${GCLOUD_PROJECT}"
 fi
 
+
+#Select for costcenter tag, you can use multiple selects for predefined values for tags
+#Tags only admin letters, numbers, underscores and hiphens
+
 PS3='Please enter the number corresponding to the costcenter tag to apply:'
 costtag=("sales" "engineering" "proserve" "support")
 select opt in "${costtag[@]}"
@@ -142,7 +150,7 @@ do
     esac
 done
 
-
+#Optional labels
 echo "The following are optional tags, press enter in case you don't need them:"
 echo "End date for your namespace (mm-dd-yyyy):"
 read END_DATE
@@ -151,7 +159,10 @@ read OPPORTUNITY_ID
 echo "Account name (Within SFDC):"
 read ACCOUNT_NAME
 
+
+#Adding the labels, we overwrite them to allow multiple executions
 kubectl label --overwrite namespace "${NAMESPACE}" owner="${OWNER_LABEL}" costcenter="${COSTCENTER_TAG}" opportunityID="${OPPORTUNITY_ID}" accountName="${ACCOUNT_NAME}" endDate="${END_DATE}"
 
 
+#Just for checking the applied labels
 kubectl get namespace "${NAMESPACE}" --show-labels
