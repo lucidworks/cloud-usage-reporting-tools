@@ -268,6 +268,7 @@ else
   exit 1
 fi
 
+
 while [[ -z "${PURPOSE}" ]]; do
   read -p "Provide a purpose, customer, or prospect name (as required by department policy): " PURPOSE
 done
@@ -281,6 +282,7 @@ echo
 echo "Label owner: [${OWNER_LABEL}]"
 echo "Label cost-center: [${COST_CENTER}]" >&2
 echo "Label purpose: [${PURPOSE}]" >&2
+
 
 if [[ "${NAMESPACE}" == "-" ]]; then
   gcloud container clusters update "${CLUSTER_NAME}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_}"
