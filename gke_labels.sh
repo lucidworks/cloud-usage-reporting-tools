@@ -15,10 +15,11 @@ function print_usage() {
   ERROR_MSG="$2"
 
   if [ "$ERROR_MSG" != "" ]; then
-    echo -e "\nERROR: $ERROR_MSG\n" >&2
+    echo -e "\nERROR: $ERROR_MSG" >&2
   fi
 
 cat >&2 <<'EOF'
+
   -p                GCP project ID
   -c                GKE cluster name
   -n                Kubernetes namespace to label, or dash (-) to label cluster instead of a namespace
@@ -114,7 +115,7 @@ if [ $# -gt 0 ]; then
   done
 fi
 
-echo 'Checking environment and prerequisites...'
+echo 'Checking environment and prerequisites...' >&2
 gcloud --version > /dev/null 2<&1
 has_prereq=$?
 if [[ $has_prereq -eq 127 ]]; then
@@ -129,7 +130,7 @@ if [[ -z "$who_am_i"  ]]; then
   exit 1
 fi
 
-echo -e "\nLogged in as: $who_am_i\n" 1>&2
+echo -e "Logged in as: $who_am_i" >&2
 OWNER_LABEL="${who_am_i//[^a-zA-Z0-9\.\_\-]/-}"
 OWNER_LABEL="${OWNER_LABEL//\./_}"
 OWNER_LABEL="${OWNER_LABEL:0:63}"
@@ -161,7 +162,7 @@ echo "Using GCP project ID [${GCLOUD_PROJECT}]" >&2
 GCLOUD_PROJECT=$(gcloud projects describe "${GCLOUD_PROJECT}" --format 'value(projectId)')
 has_project=$?
 if [ $has_project -ne 0 ] ; then 
-  echo "ERROR: Project [${GCLOUD_PROJECT}] not found" >&2
+  echo -e "\nERROR: Project [${GCLOUD_PROJECT}] not found" >&2
   exit $has_project
 fi
 
@@ -184,7 +185,7 @@ echo "Using GKE cluster name [${CLUSTER_NAME}]" >&2
 clust_loc=($(gcloud container clusters list --project "${GCLOUD_PROJECT}" --filter "name=${CLUSTER_NAME}" --format "value(name,location)" --limit 1))
 has_cluster=$?
 if [[ -z "${clust_loc[0]}" || $has_cluster -ne 0 ]]; then
-  echo "ERROR: Cluster [${CLUSTER_NAME}] not found in project" >&2
+  echo -e "\nERROR: Cluster [${CLUSTER_NAME}] not found in project" >&2
   exit $(($has_cluster>0?$has_cluster:1))
 fi
 CLUSTER_NAME=${clust_loc[0]}
@@ -214,7 +215,7 @@ if [[ "${NAMESPACE}" != "-" ]]; then
   ns=($(kubectl get ns --field-selector "metadata.name=${NAMESPACE}" -o jsonpath="{$.items[*].metadata.name}"))
   NAMESPACE=${ns[0]}
   if [[ -z "${NAMESPACE}" ]] ; then
-    echo "ERROR: Namespace [${NAMESPACE}] not found in cluster" >&2
+    echo -e "\nERROR: Namespace [${NAMESPACE}] not found in cluster" >&2
     exit 1
   fi
 fi
@@ -264,7 +265,7 @@ done
 if [[ -n "$has_costcenter" ]] ; then
   COST_CENTER="$has_costcenter"
 else
-  echo "ERROR: Invalid cost center [${COST_CENTER}]" >&2
+  echo -e "\nERROR: Invalid cost center [${COST_CENTER}]" >&2
   exit 1
 fi
 
@@ -278,7 +279,7 @@ PURPOSE="${PURPOSE:0:63}"
 PURPOSE="${PURPOSE/#[^A-Za-z0-9]/0}"
 PURPOSE="${PURPOSE/%[^A-Za-z0-9]/0}"
 
-echo
+echo >&2
 echo "Label owner: [${OWNER_LABEL}]"
 echo "Label cost-center: [${COST_CENTER}]" >&2
 echo "Label purpose: [${PURPOSE}]" >&2
@@ -306,7 +307,7 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
         darwin*)
           endiso=$(date -j -f '%Y-%m-%d' "${END_DATE}" '+%Y-%m-%d') && endepoch=$(date -j -f '%Y-%m-%d' "${END_DATE}" '+%s') && nowepoch=$(date -j '+%s') || END_DATE=
           ;;
-        *) echo "ERROR: ${OSTYPE} not supported" >&2 ; exit 1 ;;
+        *) echo -e "\nERROR: ${OSTYPE} not supported" >&2 ; exit 1 ;;
       esac
       let daysdiff="( $endepoch - $nowepoch ) / 86400"
     elif [[ "${END_DATE}" =~ ^\+?[[:digit:]]+$ ]]; then
@@ -318,7 +319,7 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
         darwin*)
           endiso=$(date -j "-v+${daysdiff}d" '+%Y-%m-%d')
           ;;
-        *) echo "ERROR: ${OSTYPE} not supported" >&2 ; exit 1 ;;
+        *) echo -e "\nERROR: ${OSTYPE} not supported" >&2 ; exit 1 ;;
       esac
     else
       echo "Invalid end date specification [${END_DATE}]"
@@ -327,7 +328,7 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
     if [[ -n "${END_DATE}" ]] ; then break ; fi
 
     if [[ "${COST_CENTER}" == 5??_* && $daysdiff -gt 30 ]]; then
-      echo "ERROR: [${END_DATE}] is ${daysdiff} from today, which is above the allowed maximum"
+      echo -e "\nERROR: [${END_DATE}] is ${daysdiff} from today, which is above the allowed maximum" >&2
       END_DATE=
     fi
 
