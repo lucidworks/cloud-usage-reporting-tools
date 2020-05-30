@@ -26,7 +26,7 @@ In all cases, the script will provide feedback on parameters to stdout
   -n                Kubernetes namespace to label, or dash (-) to label cluster instead of a namespace
   --cost-center     Cost center for the namespace (NNN, or eng or sales or proserve or support (stored as NNNN))
   --purpose         Purpose, Salesforce customer or prospect name
-  --end-date        Expected end date for the namespace (YYYY-MM-DD or +NN in days)
+  --end-date        Expected end date for the namespace (NN days from now or YYYY-mm-dd)
   --sfdc-oppid      Salesforce Opportunity ID
   -?,-help          Display this help
     -usage,
