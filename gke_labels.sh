@@ -156,7 +156,6 @@ while [[ -z "${GCLOUD_PROJECT}" ]]; do
     read -p "Enter a GCP project ID: " GCLOUD_PROJECT
   fi
 done
-GCLOUD_PROJECT=${GCLOUD_PROJECT,,}
 GCLOUD_PROJECT=${GCLOUD_PROJECT//[^a-zA-Z0-9\-]/-}
 echo "Using GCP project ID [${GCLOUD_PROJECT}]" >&2
 GCLOUD_PROJECT=$(gcloud projects describe "${GCLOUD_PROJECT}" --format 'value(projectId)')
