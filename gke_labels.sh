@@ -179,7 +179,6 @@ while [[ -z "${CLUSTER_NAME}" ]]; do
     read -p "Enter a GKE cluster name: " CLUSTER_NAME
   fi
 done
-CLUSTER_NAME=${CLUSTER_NAME,,}
 CLUSTER_NAME=${CLUSTER_NAME//[^a-zA-Z0-9\-]/-}
 echo "Using GKE cluster name [${CLUSTER_NAME}]" >&2
 clust_loc=($(gcloud container clusters list --project "${GCLOUD_PROJECT}" --filter "name=${CLUSTER_NAME}" --format "value(name,location)" --limit 1))
