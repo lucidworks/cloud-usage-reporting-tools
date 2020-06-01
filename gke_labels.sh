@@ -295,7 +295,7 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
   
   while true ; do
     if [[ -z "${END_DATE}" ]]; then
-      read -p "Enter expected end date as days from today as NN, or as YYYY-mm-dd (e.g. 12 or 1977-05-25): " END_DATE
+      read -p "Enter expected end date as days from today as NN, or as YYYY-mm-dd (e.g. 10 or 1977-05-25): " END_DATE
     fi
     if [[ "${END_DATE}" =~ ^[[:digit:]]{4}-[[:digit:]]{1,2}-[[:digit:]]{1,2}$ ]]; then
       case ${OSTYPE} in
