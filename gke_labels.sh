@@ -323,13 +323,13 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
       echo "Invalid end date specification [${END_DATE}]"
       END_DATE=
     fi
-    if [[ -n "${END_DATE}" ]] ; then break ; fi
 
     if [[ "${COST_CENTER}" == 5??_* && $daysdiff -gt 30 ]]; then
       echo -e "\nERROR: [${END_DATE}] is ${daysdiff} from today, which is above the allowed maximum" >&2
       END_DATE=
     fi
 
+    if [[ -n "${END_DATE}" ]] ; then break ; fi
   done
   END_DATE=$endiso
   echo "Label end-date: [${END_DATE}] (${daysdiff} days from today)" >&2
