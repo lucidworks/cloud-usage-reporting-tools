@@ -325,7 +325,7 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
     fi
 
     if [[ "${COST_CENTER}" == 5??_* && $daysdiff -gt 30 ]]; then
-      echo -e "\nERROR: [${END_DATE}] is ${daysdiff} from today, which is above the allowed maximum" >&2
+      echo -e "\nERROR: [Ending date ${END_DATE}] is ${daysdiff} days from today, which is above the allowed maximum" >&2
       END_DATE=
     fi
 
