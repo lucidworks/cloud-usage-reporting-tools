@@ -284,7 +284,7 @@ echo "Label purpose: [${PURPOSE}]" >&2
 
 
 if [[ "${NAMESPACE}" == "-" ]]; then
-  gcloud container clusters update "${CLUSTER_NAME}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_}"
+  gcloud container clusters update "${CLUSTER_NAME}" --region "${location}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_}"
   kubectl label --overwrite ns "kube-system" "owner=${OWNER_LABEL}" "cost-center=${COST_CENTER}" "purpose=${PURPOSE}" -o jsonpath='{.}'
 else
   kubectl label --overwrite ns "${NAMESPACE}" "owner=${OWNER_LABEL}" "cost-center=${COST_CENTER}" "purpose=${PURPOSE}" -o jsonpath='{.}'
@@ -335,7 +335,7 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
   echo "Label end-date: [${END_DATE}] (${daysdiff} days from today)" >&2
 
   if [[ "${NAMESPACE}" == "-" ]]; then
-    gcloud container clusters update "${CLUSTER_NAME}" --update-labels "end-date=${END_DATE}"
+    gcloud container clusters update "${CLUSTER_NAME}" --region "${location}" --update-labels "end-date=${END_DATE}"
     kubectl label --overwrite ns "kube-system" "end-date=${END_DATE}" -o jsonpath='{.}'
   else
     kubectl label --overwrite ns "${NAMESPACE}" "end-date=${END_DATE}" -o jsonpath='{.}'
