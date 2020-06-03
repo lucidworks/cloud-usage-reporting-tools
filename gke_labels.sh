@@ -336,7 +336,7 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
 
   if [[ "${NAMESPACE}" == "-" ]]; then
     gcloud container clusters update "${CLUSTER_NAME}" --update-labels "end-date=${END_DATE}"
-    kubectl label --overwrite ns "kube-system" "end-date=${END_DATE}" -o jsonpathy='{.}'
+    kubectl label --overwrite ns "kube-system" "end-date=${END_DATE}" -o jsonpath='{.}'
   else
     kubectl label --overwrite ns "${NAMESPACE}" "end-date=${END_DATE}" -o jsonpath='{.}'
   fi
