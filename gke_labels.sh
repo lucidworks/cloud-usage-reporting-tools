@@ -284,7 +284,7 @@ echo "Label purpose: [${PURPOSE}]" >&2
 
 
 if [[ "${NAMESPACE}" == "-" ]]; then
-  gcloud container clusters update "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_}" > /dev/null
+  gcloud container clusters update "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_}" 2> /dev/null
   kubectl label --overwrite ns "kube-system" "owner=${OWNER_LABEL}" "cost-center=${COST_CENTER}" "purpose=${PURPOSE}" -o jsonpath='{.}'
 else
   kubectl label --overwrite ns "${NAMESPACE}" "owner=${OWNER_LABEL}" "cost-center=${COST_CENTER}" "purpose=${PURPOSE}" -o jsonpath='{.}'
