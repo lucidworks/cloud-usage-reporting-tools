@@ -132,7 +132,7 @@ fi
 
 echo -e "Logged in as: $who_am_i" >&2
 OWNER_LABEL="${who_am_i//[^a-zA-Z0-9\.\_\-]/-}"
-OWNER_LABEL="${OWNER_LABEL//\./_}"
+#OWNER_LABEL="${OWNER_LABEL//\./_}"
 OWNER_LABEL="${OWNER_LABEL:0:63}"
 OWNER_LABEL="${OWNER_LABEL/%[^A-Za-z0-9]/0}"
 
@@ -335,7 +335,7 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
   echo "Label end-date: [${END_DATE}] (${daysdiff} days from today)" >&2
 
   if [[ "${NAMESPACE}" == "-" ]]; then
-    gcloud container clusters update "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" --update-labels "end-date=${END_DATE}" 2> /dev/null
+    gcloud container clusters update "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_},end-date=${END_DATE}" 2> /dev/null
     kubectl label --overwrite ns "kube-system" "end-date=${END_DATE}" -o jsonpath='{.}'
   else
     kubectl label --overwrite ns "${NAMESPACE}" "end-date=${END_DATE}" -o jsonpath='{.}'
