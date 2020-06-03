@@ -116,6 +116,7 @@ if [ $# -gt 0 ]; then
 fi
 
 echo 'Checking environment and prerequisites...' >&2
+echo >&2
 gcloud --version > /dev/null 2<&1
 has_prereq=$?
 if [[ $has_prereq -eq 127 ]]; then
@@ -131,6 +132,7 @@ if [[ -z "$who_am_i"  ]]; then
 fi
 
 echo -e "Logged in as: $who_am_i" >&2
+echo >&2
 OWNER_LABEL="${who_am_i//[^a-zA-Z0-9\.\_\-]/-}"
 #OWNER_LABEL="${OWNER_LABEL//\./_}"
 OWNER_LABEL="${OWNER_LABEL:0:63}"
@@ -194,7 +196,7 @@ echo "Found [${CLUSTER_NAME}] in location [${location}]" >&2
 
 export KUBECONFIG="$(mktemp)"
 trap "rm -rf ${KUBECONFIG}" EXIT
-gcloud container clusters get-credentials "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" 2> /dev/null
+gcloud container clusters get-credentials "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}"
 while [[ -z "${NAMESPACE}" ]]; do
   namespaces=$(kubectl get ns -o jsonpath='{$.items[*].metadata.name}')
   if [[ -n "$namespaces" ]]; then
@@ -284,14 +286,14 @@ echo "Label purpose: [${PURPOSE}]" >&2
 
 
 if [[ "${NAMESPACE}" == "-" ]]; then
-  gcloud container clusters update "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_}" 2> /dev/null
+  gcloud container clusters update "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_}" --quiet
   kubectl label --overwrite ns "kube-system" "owner=${OWNER_LABEL}" "cost-center=${COST_CENTER}" "purpose=${PURPOSE}" -o jsonpath='{.}'
 else
   kubectl label --overwrite ns "${NAMESPACE}" "owner=${OWNER_LABEL}" "cost-center=${COST_CENTER}" "purpose=${PURPOSE}" -o jsonpath='{.}'
 fi
 
 
-if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
+if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* || -n "${END_DATE}" ]] ; then
   
   while true ; do
     if [[ -z "${END_DATE}" ]]; then
@@ -335,10 +337,10 @@ if [[ "${COST_CENTER}" == 5??_* || "${COST_CENTER}" == 310_* ]] ; then
   echo "Label end-date: [${END_DATE}] (${daysdiff} days from today)" >&2
 
   if [[ "${NAMESPACE}" == "-" ]]; then
-    gcloud container clusters update "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_},end-date=${END_DATE}" 2> /dev/null
-    kubectl label --overwrite ns "kube-system" "end-date=${END_DATE}" -o jsonpath='{.}'
+    gcloud container clusters update "${CLUSTER_NAME}" --project "${GCLOUD_PROJECT}" --region "${location}" --update-labels "owner=${OWNER_LABEL//\./_},cost-center=${COST_CENTER},purpose=${PURPOSE//\./_},end-date=${END_DATE}" --quiet
+    kubectl label --overwrite ns "kube-system" "owner=${OWNER_LABEL}" "cost-center=${COST_CENTER}" "purpose=${PURPOSE}" "end-date=${END_DATE}" -o jsonpath='{.}'
   else
-    kubectl label --overwrite ns "${NAMESPACE}" "end-date=${END_DATE}" -o jsonpath='{.}'
+    kubectl label --overwrite ns "${NAMESPACE}" "owner=${OWNER_LABEL}" "cost-center=${COST_CENTER}" "purpose=${PURPOSE}" "end-date=${END_DATE}" -o jsonpath='{.}'
   fi
 
 fi
